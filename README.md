@@ -102,25 +102,6 @@ export function getUserName(user: any) {
 - **定数**: UPPER_SNAKE_CASE (`API_ENDPOINT`)
 - **型・インターフェース**: PascalCase (`User`, `EventProps`)
 
-### コンポーネント
-
-```typescript
-// ✅ Good
-interface CalendarEventProps {
-  title: string;
-  date: Date;
-}
-
-export function CalendarEvent({ title, date }: CalendarEventProps) {
-  return <div>{title}</div>;
-}
-
-// ❌ Bad
-export const CalendarEvent: React.FC<{ title: string; date: Date }> = ({ title, date }) => {
-  return <div>{title}</div>;
-};
-```
-
 ### ブランチ戦略
 
 - `main`: 本番環境
