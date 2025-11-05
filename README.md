@@ -2,6 +2,9 @@
 
 VRChatイベントを管理するためのカレンダーアプリケーション
 
+## 設計
+swagger: https://yutaro04.github.io/vrchat-calender-app/swagger/
+
 ## 🚀 技術スタック
 
 - **Framework**: Next.js 16 (App Router)
