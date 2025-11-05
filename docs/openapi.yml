@@ -1,21 +1,518 @@
 openapi: 3.0.3
 info:
   title: VRChat Calendar API
-  description: イベント募集Webアプリケーション用のREST API
+  description: CRChatイベント募集Webアプリケーション用のREST API
   version: 1.0.0
 servers:
   - url: http://localhost:3000/api
     description: ローカル開発環境
-  - url: https://api.vrchat-calendar.example.com
-    description: 本番環境
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: ユーザーID
+          example: 1
+        nickname:
+          type: string
+          description: ニックネーム
+          example: "VRユーザー太郎"
+        description:
+          type: string
+          description: 自己紹介
+          example: "VRChat初心者です。よろしくお願いします！"
+        avatar_image_url:
+          type: string
+          description: アバター画像URL
+          example: "https://example.com/avatar/user1.png"
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+    
+    Event:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: イベントID
+          example: 1
+        title:
+          type: string
+          description: イベントタイトル
+          example: "VRChatでのお花見イベント"
+        description:
+          type: string
+          description: イベント概要
+          example: "桜の季節にVRChatワールドでお花見を楽しみましょう！"
+        device_id:
+          type: integer
+          description: 対応デバイスID
+          example: 1
+        device_name:
+          type: string
+          description: 対応デバイス名
+          example: "PC"
+        max_participants_num:
+          type: integer
+          description: 最大参加人数
+          example: 20
+        main_image_url:
+          type: string
+          description: メイン画像URL
+          example: "https://example.com/events/event1.png"
+        deadline:
+          type: string
+          format: date-time
+          description: 応募締め切り
+          example: "2025-04-03T23:59:59+09:00"
+        event_dates:
+          type: array
+          description: イベント開催日程
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              start_date:
+                type: string
+                format: date-time
+                example: "2025-04-05T18:00:00+09:00"
+              end_date:
+                type: string
+                format: date-time
+                example: "2025-04-05T20:00:00+09:00"
+        created_at:
+          type: string
+          format: date-time
+          description: 作成日時
+        updated_at:
+          type: string
+          format: date-time
+          description: 更新日時
+    
+    EventParticipant:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 参加申請ID
+          example: 1
+        event_id:
+          type: integer
+          description: イベントID
+          example: 1
+        user_id:
+          type: integer
+          description: ユーザーID
+          example: 1
+        user:
+          $ref: '#/components/schemas/User'
+        role:
+          type: string
+          description: 役職
+          enum: [organizer, participant]
+          example: "participant"
+        status:
+          type: string
+          description: 参加ステータス
+          enum: [pending, approved, rejected, cancelled]
+          example: "pending"
+        applied_at:
+          type: string
+          format: date-time
+          description: 申請日時
+    
+    Error:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "エラーメッセージ"
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
 
 paths:
+  /auth/register:
+    post:
+      summary: ユーザー登録
+      description: 新規ユーザーを登録します
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nickname
+                - password
+              properties:
+                nickname:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                  description: ニックネーム（ユニーク）
+                  example: "VRユーザー太郎"
+                password:
+                  type: string
+                  minLength: 8
+                  description: パスワード
+                  example: "password123"
+                description:
+                  type: string
+                  description: 自己紹介
+                  example: "VRChat初心者です"
+                avatar_image_url:
+                  type: string
+                  description: アバター画像URL
+                  example: "https://example.com/avatar.png"
+      responses:
+        '201':
+          description: ユーザー登録成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: "ユーザー登録が完了しました"
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+                      token:
+                        type: string
+                        description: 認証トークン
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '400':
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: ニックネームが既に使用されています
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /auth/login:
+    post:
+      summary: ログイン
+      description: ユーザーがログインします
+      tags:
+        - Authentication
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nickname
+                - password
+              properties:
+                nickname:
+                  type: string
+                  description: ニックネーム
+                  example: "VRユーザー太郎"
+                password:
+                  type: string
+                  description: パスワード
+                  example: "password123"
+      responses:
+        '200':
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "ログインしました"
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+                      token:
+                        type: string
+                        description: 認証トークン
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '401':
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /auth/logout:
+    post:
+      summary: ログアウト
+      description: ユーザーがログアウトします
+      tags:
+        - Authentication
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: ログアウト成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "ログアウトしました"
+        '401':
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /users/me:
+    get:
+      summary: 自分のユーザー情報を取得
+      description: 認証済みユーザーの情報を取得します
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: ユーザー情報取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  data:
+                    $ref: '#/components/schemas/User'
+        '401':
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      summary: ユーザー情報更新
+      description: 認証済みユーザーの情報を更新します
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nickname:
+                  type: string
+                  minLength: 1
+                  maxLength: 50
+                  description: ニックネーム
+                  example: "VRユーザー太郎"
+                description:
+                  type: string
+                  description: 自己紹介
+                  example: "VRChat初心者です"
+                avatar_image_url:
+                  type: string
+                  description: アバター画像URL
+                  example: "https://example.com/avatar.png"
+                password:
+                  type: string
+                  minLength: 8
+                  description: 新しいパスワード（変更する場合）
+                  example: "newpassword123"
+      responses:
+        '200':
+          description: ユーザー情報更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "ユーザー情報を更新しました"
+                  data:
+                    $ref: '#/components/schemas/User'
+        '400':
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: ニックネームが既に使用されています
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /users/me/events:
+    get:
+      summary: 自分が参加申請した（または参加確定した）イベント一覧を取得
+      description: 認証済みユーザーが参加申請または参加確定したイベントの一覧を取得します
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          description: 参加ステータスでフィルタリング
+          schema:
+            type: string
+            enum: [pending, approved, rejected, cancelled]
+          example: "approved"
+      responses:
+        '200':
+          description: イベント一覧取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        participant:
+                          $ref: '#/components/schemas/EventParticipant'
+                        event:
+                          $ref: '#/components/schemas/Event'
+        '401':
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
   /events:
+    get:
+      summary: イベント一覧を取得
+      description: イベントの一覧を取得します
+      tags:
+        - Events
+      parameters:
+        - name: device_id
+          in: query
+          description: デバイスIDでフィルタリング
+          schema:
+            type: integer
+          example: 1
+        - name: limit
+          in: query
+          description: 取得件数
+          schema:
+            type: integer
+            default: 20
+          example: 20
+        - name: offset
+          in: query
+          description: オフセット
+          schema:
+            type: integer
+            default: 0
+          example: 0
+      responses:
+        '200':
+          description: イベント一覧取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  data:
+                    type: object
+                    properties:
+                      events:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Event'
+                      total:
+                        type: integer
+                        description: 総イベント数
+                        example: 100
+        '400':
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
     post:
       summary: イベント投稿
       description: 新しいイベントを投稿します
       tags:
         - Events
+      security:
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -46,7 +543,7 @@ paths:
                   minLength: 1
                   maxLength: 2000
                   example: "桜の季節にVRChatワールドでお花見を楽しみましょう！初心者歓迎です。"
-                image:
+                mainImageUrl:
                   type: string
                   format: binary
                   description: イベント画像（1枚）
@@ -167,52 +664,343 @@ paths:
                   message:
                     type: string
                     example: "サーバー内部エラーが発生しました"
-
-components:
-  schemas:
-    Event:
-      type: object
-      properties:
-        id:
-          type: string
+  
+  /events/{eventId}:
+    get:
+      summary: イベント詳細取得
+      description: 指定したIDのイベント詳細を取得します
+      tags:
+        - Events
+      parameters:
+        - name: eventId
+          in: path
+          required: true
           description: イベントID
-        posterId:
-          type: string
-          description: 投稿者ID
-        title:
-          type: string
-          description: イベントのタイトル
-        text:
-          type: string
-          description: イベントの詳細説明
-        imageUrl:
-          type: string
-          description: イベント画像のURL
-        device:
-          type: string
-          enum:
-            - PC
-            - Android
-          description: 対応デバイス
-        maxParticipants:
-          type: integer
-          description: 最大参加人数
-        eventDates:
-          type: array
-          items:
-            type: object
-            properties:
-              startDateTime:
-                type: string
-                format: date-time
-              endDateTime:
-                type: string
-                format: date-time
-        createdAt:
-          type: string
-          format: date-time
-          description: 作成日時
-        updatedAt:
-          type: string
-          format: date-time
-          description: 更新日時
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: イベント詳細取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '404':
+          description: イベントが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    put:
+      summary: イベント情報を更新
+      description: 指定したIDのイベント情報を更新します（主催者のみ）
+      tags:
+        - Events
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: イベントID
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  minLength: 1
+                  maxLength: 100
+                  description: イベントタイトル
+                  example: "VRChatでのお花見イベント"
+                description:
+                  type: string
+                  description: イベント概要
+                  example: "桜の季節にVRChatワールドでお花見を楽しみましょう！"
+                device_id:
+                  type: integer
+                  description: 対応デバイスID
+                  example: 1
+                max_participants_num:
+                  type: integer
+                  description: 最大参加人数
+                  minimum: 1
+                  example: 20
+                main_image_url:
+                  type: string
+                  description: メイン画像URL
+                  example: "https://example.com/events/event1.png"
+                deadline:
+                  type: string
+                  format: date-time
+                  description: 応募締め切り
+                  example: "2025-04-03T23:59:59+09:00"
+                event_dates:
+                  type: array
+                  description: イベント開催日程
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        description: 既存の日程を更新する場合はIDを指定
+                        example: 1
+                      start_date:
+                        type: string
+                        format: date-time
+                        example: "2025-04-05T18:00:00+09:00"
+                      end_date:
+                        type: string
+                        format: date-time
+                        example: "2025-04-05T20:00:00+09:00"
+      responses:
+        '200':
+          description: イベント更新成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "イベント情報を更新しました"
+                  data:
+                    $ref: '#/components/schemas/Event'
+        '400':
+          description: リクエストエラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: 権限エラー（主催者のみ更新可能）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: イベントが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    delete:
+      summary: イベント削除
+      description: 指定したIDのイベントを削除します（主催者のみ）
+      tags:
+        - Events
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: イベントID
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: イベント削除成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "イベントを削除しました"
+        '401':
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: 権限エラー（主催者のみ削除可能）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: イベントが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /events/{eventId}/participants:
+    get:
+      summary: イベント参加者一覧取得
+      description: 指定したイベントの参加者一覧を取得します
+      tags:
+        - Event Participants
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: イベントID
+          schema:
+            type: integer
+          example: 1
+        - name: status
+          in: query
+          description: 参加ステータスでフィルタリング
+          schema:
+            type: string
+            enum: [pending, approved, rejected, cancelled]
+          example: "approved"
+      responses:
+        '200':
+          description: 参加者一覧取得成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/EventParticipant'
+        '404':
+          description: イベントが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    
+    post:
+      summary: イベントに参加を申請する
+      description: 指定したイベントに参加を申請します
+      tags:
+        - Event Participants
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: イベントID
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  description: 役職
+                  enum: [participant]
+                  default: participant
+                  example: "participant"
+      responses:
+        '201':
+          description: 参加申請成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: "イベントへの参加を申請しました"
+                  data:
+                    $ref: '#/components/schemas/EventParticipant'
+        '400':
+          description: リクエストエラー（既に申請済み、定員超過など）
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: イベントが見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  
+  /events/{eventId}/participants/me:
+    delete:
+      summary: イベント参加をキャンセル
+      description: 指定したイベントへの参加をキャンセルします
+      tags:
+        - Event Participants
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: eventId
+          in: path
+          required: true
+          description: イベントID
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: 参加キャンセル成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: "イベント参加をキャンセルしました"
+        '401':
+          description: 認証エラー
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: 参加申請が見つかりません
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
