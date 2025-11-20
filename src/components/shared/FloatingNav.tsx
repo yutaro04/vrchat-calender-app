@@ -1,14 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
 import { Home, Search, Calendar, User, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export function FloatingNav() {
   const [isAtTop, setIsAtTop] = useState(true);
-  const pathname = usePathname();
-  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -26,12 +23,8 @@ export function FloatingNav() {
         <div className="flex items-center justify-around lg:justify-start w-full gap-1">
           {/* User Info Section - Desktop Only */}
           <div className="hidden lg:flex items-center gap-2 pr-2">
-            <div className="w-8 h-8 rounded-full bg-gray-900 border-2 border-gray-900 overflow-hidden flex-shrink-0">
-              <img 
-                src="https://api.dicebear.com/7.x/avataaars/svg?seed=User" 
-                alt="User Avatar"
-                className="w-full h-full object-cover"
-              />
+            <div className="w-8 h-8 rounded-full bg-gray-900 border-2 border-gray-900 overflow-hidden flex-shrink-0 flex items-center justify-center">
+              <User className="w-5 h-5 text-white" />
             </div>
             <div className="flex flex-col">
               <span className="text-xs text-gray-900 whitespace-nowrap">User Name</span>
