@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Home, Search, Calendar, User, Plus } from "lucide-react";
 import { useState, useEffect } from "react";
+import ROUTES from "../../lib/routes";
 
 export function FloatingNav() {
   const [isAtTop, setIsAtTop] = useState(true);
@@ -35,26 +36,26 @@ export function FloatingNav() {
           
           {/* Navigation Icons */}
           <div className="flex items-center justify-around lg:justify-start w-full lg:w-auto gap-0 lg:gap-1 lg:pl-1">
-            <Link href="/" className="p-2.5 rounded-full hover:bg-gray-100 transition-colors flex flex-col items-center gap-1 lg:flex-row" aria-label="Home">
+            <Link href={ROUTES.HOME} className="p-2.5 rounded-full hover:bg-gray-100 transition-colors flex flex-col items-center gap-1 lg:flex-row" aria-label="Home">
               <Home className="w-5 h-5 lg:w-4 lg:h-4 text-gray-900" />
               <span className="text-xs lg:hidden text-gray-900">ホーム</span>
             </Link>
-            <Link href="/search" className="p-2.5 rounded-full hover:bg-gray-100 transition-colors flex flex-col items-center gap-1 lg:flex-row" aria-label="Search">
+            <Link href={ROUTES.EVENT_SEARCH} className="p-2.5 rounded-full hover:bg-gray-100 transition-colors flex flex-col items-center gap-1 lg:flex-row" aria-label="Search">
               <Search className="w-5 h-5 lg:w-4 lg:h-4 text-gray-900" />
               <span className="text-xs lg:hidden text-gray-900">検索</span>
             </Link>
-            <Link href="/events" className="p-2.5 rounded-full hover:bg-gray-100 transition-colors flex flex-col items-center gap-1 lg:flex-row" aria-label="Events">
+            <Link href={ROUTES.USER_EVENTS} className="p-2.5 rounded-full hover:bg-gray-100 transition-colors flex flex-col items-center gap-1 lg:flex-row" aria-label="Events">
               <Calendar className="w-5 h-5 lg:w-4 lg:h-4 text-gray-900" />
               <span className="text-xs lg:hidden text-gray-900">イベント</span>
             </Link>
-            <Link href="/profile" className="p-2.5 rounded-full hover:bg-gray-100 transition-colors flex flex-col items-center gap-1 lg:flex-row" aria-label="Profile">
+            <Link href={ROUTES.USER_PROFILE} className="p-2.5 rounded-full hover:bg-gray-100 transition-colors flex flex-col items-center gap-1 lg:flex-row" aria-label="Profile">
               <User className="w-5 h-5 lg:w-4 lg:h-4 text-gray-900" />
               <span className="text-xs lg:hidden text-gray-900">プロフィール</span>
             </Link>
             
             <div className="hidden lg:block w-px h-6 bg-gray-300 mx-1" />
             
-            <Link href="/create-event" className="p-2.5 rounded-full bg-gray-900 hover:bg-gray-700 transition-colors flex flex-col items-center gap-1 lg:flex-row" aria-label="Create Event">
+            <Link href={ROUTES.EVENT_CREATE} className="p-2.5 rounded-full bg-gray-900 hover:bg-gray-700 transition-colors flex flex-col items-center gap-1 lg:flex-row" aria-label="Create Event">
               <Plus className="w-5 h-5 lg:w-4 lg:h-4 text-white" />
               <span className="text-xs lg:hidden text-white">投稿</span>
             </Link>

@@ -1,15 +1,18 @@
+import Link from "next/link";
+import ROUTES from "../../../lib/routes";
 import { Calendar, User, Monitor, Smartphone, Image as ImageIcon } from "lucide-react";
 
 interface EventCardProps {
+  id: string | number;
   title: string;
   date: string;
   organizer: string;
   image: string;
-  device: 'PC' | 'All' | 'Android';
+  device: "PC" | "All" | "Android";
   participants?: number;
 }
 
-export function EventCard({ title, date, organizer, device, participants }: EventCardProps) {
+export function EventCard({ id, title, date, organizer, device, participants }: EventCardProps) {
   const getDeviceIcon = () => {
     if (device === 'PC') return <Monitor className="w-4 h-4" />;
     if (device === 'Android') return <Smartphone className="w-4 h-4" />;
@@ -17,7 +20,7 @@ export function EventCard({ title, date, organizer, device, participants }: Even
   };
   
   return (
-    <div className="group relative w-[200px] sm:w-[160px] flex-shrink-0">
+    <Link href={ROUTES.eventDetail(id)} className="group relative w-[200px] sm:w-[160px] flex-shrink-0">
       <div className="relative bg-white border border-gray-900 rounded overflow-hidden transition-all hover:border-gray-600">
         {/* Image as background */}
         <div className="relative aspect-[4/5] overflow-hidden bg-gray-100">
@@ -61,6 +64,6 @@ export function EventCard({ title, date, organizer, device, participants }: Even
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }
