@@ -1,6 +1,5 @@
 import Link from "next/link";
 import ROUTES from "../lib/routes";
-import { FloatingNav } from "../components/shared/FloatingNav";
 import { EventCard } from "../components/features/events/EventCard";
 
 
@@ -145,9 +144,6 @@ const newEvents: Event[] = [
 export default function Home() {
   return (
     <div className="min-h-screen bg-transparent relative flex flex-col">
-
-      <FloatingNav />
-
       <main className="relative z-10 flex-1 pb-24 lg:pb-0">
 
         <div className="py-12 max-w-[1400px] mx-auto px-8">
