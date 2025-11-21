@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { BackgroundPattern } from "../components/shared/BackgroundPattern";
+import HeroSection from "../components/shared/VRChatEventsLogo";
+import { FloatingNav } from "../components/shared/FloatingNav";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +30,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div className="relative min-h-screen">
+          <BackgroundPattern />
+          <HeroSection />
+          <FloatingNav />
+          {children}
+        </div>
       </body>
     </html>
   );
