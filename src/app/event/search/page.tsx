@@ -373,7 +373,7 @@ const weekEvents: Event[] = [
     id: 32,
     title: "金曜夜のDJパーティー",
     startTime: "22:00",
-    endTime: "24:00",
+    endTime: "00:00",
     day: 5,
     organizer: "Friday Night",
     image: "https://images.unsplash.com/photo-1574391884720-bbc3740c59d1?w=400",
