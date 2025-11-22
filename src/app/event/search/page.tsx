@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Monitor, Smartphone, ChevronLeft, ChevronRight, Image as ImageIcon } from "lucide-react";
 
 interface Event {
@@ -552,6 +552,18 @@ export default function SearchPage() {
     setSelectedEvent(null);
   };
 
+  // Handle Escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && selectedEvent) {
+        closeEventDetails();
+      }
+    };
+    
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [selectedEvent]);
+
   const getDeviceIcon = (device: 'PC' | 'All' | 'Android') => {
     if (device === 'PC') return <Monitor className="w-3 h-3" />;
     if (device === 'Android') return <Smartphone className="w-3 h-3" />;
@@ -739,14 +751,14 @@ export default function SearchPage() {
         <div 
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
           onClick={closeEventDetails}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="modal-title"
+          role="presentation"
         >
           <div 
             className="bg-white border-2 border-gray-900 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
             onClick={(e) => e.stopPropagation()}
-            role="document"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="modal-title"
           >
             {/* Modal Header */}
             <div className="sticky top-0 bg-gray-900 text-white p-4 flex justify-between items-center z-10">
@@ -839,10 +851,16 @@ export default function SearchPage() {
 
               {/* Action Buttons */}
               <div className="flex gap-3">
-                <button className="flex-1 bg-gray-900 text-white py-3 px-6 rounded-lg border-2 border-gray-900 hover:bg-gray-800 transition-all font-medium">
+                <button 
+                  onClick={closeEventDetails}
+                  className="flex-1 bg-gray-900 text-white py-3 px-6 rounded-lg border-2 border-gray-900 hover:bg-gray-800 transition-all font-medium"
+                >
                   参加する
                 </button>
-                <button className="flex-1 bg-white text-gray-900 py-3 px-6 rounded-lg border-2 border-gray-900 hover:bg-gray-50 transition-all font-medium">
+                <button 
+                  onClick={closeEventDetails}
+                  className="flex-1 bg-white text-gray-900 py-3 px-6 rounded-lg border-2 border-gray-900 hover:bg-gray-50 transition-all font-medium"
+                >
                   詳細を見る
                 </button>
               </div>
