@@ -24,7 +24,7 @@ export default function UserEditPage() {
   const actionButtons = (
     <>
       <button
-        onClick={() => router.push('/userDetail')}
+        onClick={() => router.push('/user/profile')}
         className="px-4 py-2.5 bg-white border-2 border-gray-900 rounded-lg text-base font-normal text-gray-900 hover:bg-gray-50 transition-colors"
       >
         キャンセル
