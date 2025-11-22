@@ -739,14 +739,18 @@ export default function SearchPage() {
         <div 
           className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
           onClick={closeEventDetails}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
         >
           <div 
             className="bg-white border-2 border-gray-900 rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
             onClick={(e) => e.stopPropagation()}
+            role="document"
           >
             {/* Modal Header */}
             <div className="sticky top-0 bg-gray-900 text-white p-4 flex justify-between items-center z-10">
-              <h2 className="text-xl font-bold">イベント詳細</h2>
+              <h2 id="modal-title" className="text-xl font-bold">イベント詳細</h2>
               <button
                 onClick={closeEventDetails}
                 className="text-white hover:text-gray-300 transition-colors"
