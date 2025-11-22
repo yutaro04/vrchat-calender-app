@@ -519,7 +519,8 @@ export default function SearchPage() {
     const today = new Date();
     const dayOfWeek = today.getDay();
     const diff = today.getDate() - dayOfWeek + (weekOffset * 7);
-    const weekStart = new Date(today.setDate(diff));
+    const weekStart = new Date(today);
+    weekStart.setDate(diff);
     return weekStart;
   };
 
