@@ -636,8 +636,16 @@ export default function SearchPage() {
                 {timeSlots.map((time) => {
                   const eventsAtThisTime = selectedDayEvents.filter(event => {
                     const eventStart = timeToMinutes(event.startTime);
-                    const eventEnd = timeToMinutes(event.endTime);
+                    let eventEnd = timeToMinutes(event.endTime);
                     const slotTime = timeToMinutes(time);
+                    // If event ends before it starts, it spans midnight
+                    if (eventEnd < eventStart) {
+                      eventEnd += 1440; // add 24 hours in minutes
+                      // Also, if slotTime < eventStart, treat slotTime as after midnight
+                      if (slotTime < eventStart) {
+                        slotTime += 1440;
+                      }
+                    }
                     return slotTime >= eventStart && slotTime < eventEnd;
                   });
 
