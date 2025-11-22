@@ -637,7 +637,7 @@ export default function SearchPage() {
                   const eventsAtThisTime = selectedDayEvents.filter(event => {
                     const eventStart = timeToMinutes(event.startTime);
                     let eventEnd = timeToMinutes(event.endTime);
-                    const slotTime = timeToMinutes(time);
+                    let slotTime = timeToMinutes(time);
                     // If event ends before it starts, it spans midnight
                     if (eventEnd < eventStart) {
                       eventEnd += 1440; // add 24 hours in minutes
