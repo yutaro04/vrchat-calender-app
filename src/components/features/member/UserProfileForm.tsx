@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
+import { CldImage } from 'next-cloudinary';
 
 interface UserData {
   nickname: string;
@@ -34,19 +34,6 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({
 
   return (
     <div className="min-h-screen relative">
-      {/* Background Pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="text-xs text-black absolute" style={{ transform: 'rotate(15deg)', top: '30%', left: '5%' }}>
-          01001000 01000101 01001100 01001100 01001111
-        </div>
-        <div className="text-xs text-black absolute" style={{ transform: 'rotate(-10deg)', top: '60%', right: '10%' }}>
-          01010110 01001001 01010010 01010100 01010101 01000001 01001100
-        </div>
-        <div className="text-xs text-black absolute" style={{ transform: 'rotate(5deg)', bottom: '20%', left: '15%' }}>
-          01000101 01010110 01000101 01001110 01010100
-        </div>
-      </div>
-
       {/* Main Content */}
       <div className="relative z-10 px-8 py-32">
         <div className="max-w-4xl mx-auto">
@@ -76,8 +63,8 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({
               {/* Avatar and Nickname Row */}
               <div className="flex items-center gap-6 border-b-2 border-gray-200 pb-6 mb-4">
                 <div className="w-20 h-20 bg-gray-200 rounded-full border-4 border-gray-900 overflow-hidden flex-shrink-0">
-                  <Image
-                    src="/api/placeholder/80/80"
+                  <CldImage
+                    src="samples/animals/three-dogs"
                     alt="プロフィール写真"
                     width={80}
                     height={80}

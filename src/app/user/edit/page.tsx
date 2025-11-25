@@ -61,7 +61,6 @@ export default function UserEditPage() {
       isEditing={true}
       title="プロフィール情報編集"
       onInputChange={handleInputChange}
-      onImageChange={handleImageChange}
       actionButtons={actionButtons}
     />
   );
