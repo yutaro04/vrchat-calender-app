@@ -27,6 +27,7 @@ export default function UserProfilePage() {
     description: user.description,
     email: user.email,
     password: '********', // パスワードは表示用にマスク
+    avatar_image_url: user.avatar_image_url,
   };
 
   const { headerButton, actionButtons } = ProfileActions({ onLogout: handleLogout });

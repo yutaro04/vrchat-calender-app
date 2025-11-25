@@ -13,7 +13,11 @@ export default function UserEditPage() {
   const router = useRouter();
   const { user, isLoading, error: fetchError } = useUser();
   const { updateUserData, isUpdating, error: updateError } = useUserUpdate();
-  const { formData, handleInputChange } = useUserForm({ initialUser: user });
+  const { formData, handleInputChange, setFormData } = useUserForm({ initialUser: user });
+
+  const handleImageChange = (publicId: string) => {
+    setFormData(prev => ({ ...prev, avatar_image_url: publicId }));
+  };
 
   const handleSave = async () => {
     try {
@@ -26,6 +30,11 @@ export default function UserEditPage() {
       // パスワードが入力されている場合のみ送信
       if (formData.password && formData.password.trim() !== '') {
         updateData.password = formData.password;
+      }
+
+      // アバター画像が変更されている場合のみ送信
+      if (formData.avatar_image_url) {
+        updateData.avatar_image_url = formData.avatar_image_url;
       }
 
       await updateUserData(updateData);
@@ -52,6 +61,7 @@ export default function UserEditPage() {
       isEditing={true}
       title="プロフィール情報編集"
       onInputChange={handleInputChange}
+      onImageChange={handleImageChange}
       actionButtons={actionButtons}
     />
   );

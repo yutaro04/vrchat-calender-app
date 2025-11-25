@@ -30,7 +30,7 @@ export async function GET() {
     // const userId = verifyToken(token);
 
     // 仮のユーザーID（実装時はトークンから取得）
-    const userId = 1;
+    const userId = 16;
 
     const user = await userService.getUserById(userId);
 
@@ -62,7 +62,7 @@ export async function PUT(request: NextRequest) {
     // const userId = verifyToken(token);
 
     // 仮のユーザーID（実装時はトークンから取得）
-    const userId = 1;
+    const userId = 16;
 
     const body = await request.json();
 

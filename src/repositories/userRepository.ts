@@ -4,17 +4,7 @@
  */
 
 import type { User } from '@/types/user';
-
-// 仮のデータベース（実装時は実際のDBに接続）
-const mockUser: User = {
-  id: 1,
-  nickname: 'VRChatユーザー(APIから呼び出し)',
-  description: 'VRChatで色々なイベントに参加しています。音楽イベントやアート展示が好きです。よろしくお願いします！',
-  email: 'user@example.com',
-  avatar_image_url: '/api/placeholder/80/80',
-  created_at: '2025-01-01T00:00:00+09:00',
-  updated_at: '2025-01-01T00:00:00+09:00',
-};
+import { prisma } from '@/lib/prisma';
 
 export interface UpdateUserData {
   nickname?: string;
@@ -25,29 +15,62 @@ export interface UpdateUserData {
 }
 
 /**
+ * Prismaのユーザーオブジェクトをアプリケーション型に変換
+ */
+function mapPrismaUserToUser(prismaUser: {
+  id: number;
+  nickname: string;
+  description: string | null;
+  email: string | null;
+  avatarImageUrl: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}): User {
+  return {
+    id: prismaUser.id,
+    nickname: prismaUser.nickname,
+    description: prismaUser.description ?? undefined,
+    email: prismaUser.email ?? undefined,
+    avatar_image_url: prismaUser.avatarImageUrl ?? undefined,
+    created_at: prismaUser.createdAt.toISOString(),
+    updated_at: prismaUser.updatedAt.toISOString(),
+  };
+}
+
+/**
  * ユーザーIDでユーザーを取得
  */
 export async function findUserById(userId: number): Promise<User | null> {
-  // TODO: 実際のDB問い合わせに置き換え
-  // const user = await db.user.findUnique({ where: { id: userId } });
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+      deletedAt: null, // 論理削除されていないユーザーのみ
+    },
+  });
 
-  if (userId === mockUser.id) {
-    return mockUser;
+  if (!user) {
+    return null;
   }
-  return null;
+
+  return mapPrismaUserToUser(user);
 }
 
 /**
  * ニックネームでユーザーを検索
  */
 export async function findUserByNickname(nickname: string): Promise<User | null> {
-  // TODO: 実際のDB問い合わせに置き換え
-  // const user = await db.user.findUnique({ where: { nickname } });
+  const user = await prisma.user.findUnique({
+    where: {
+      nickname,
+      deletedAt: null, // 論理削除されていないユーザーのみ
+    },
+  });
 
-  if (nickname === mockUser.nickname) {
-    return mockUser;
+  if (!user) {
+    return null;
   }
-  return null;
+
+  return mapPrismaUserToUser(user);
 }
 
 /**
@@ -57,25 +80,26 @@ export async function updateUserById(
   userId: number,
   data: UpdateUserData
 ): Promise<User> {
-  // TODO: 実際のDB更新処理に置き換え
-  // const updatedUser = await db.user.update({
-  //   where: { id: userId },
-  //   data,
-  // });
+  const updateData: {
+    nickname?: string;
+    description?: string;
+    email?: string;
+    passwordHash?: string;
+    avatarImageUrl?: string;
+  } = {};
 
-  const updatedUser: User = {
-    ...mockUser,
-    nickname: data.nickname ?? mockUser.nickname,
-    description: data.description ?? mockUser.description,
-    email: data.email ?? mockUser.email,
-    avatar_image_url: data.avatar_image_url ?? mockUser.avatar_image_url,
-    updated_at: new Date().toISOString(),
-  };
+  if (data.nickname !== undefined) updateData.nickname = data.nickname;
+  if (data.description !== undefined) updateData.description = data.description;
+  if (data.email !== undefined) updateData.email = data.email;
+  if (data.password !== undefined) updateData.passwordHash = data.password;
+  if (data.avatar_image_url !== undefined) updateData.avatarImageUrl = data.avatar_image_url;
 
-  // モックデータを更新（実際のDBでは不要）
-  Object.assign(mockUser, updatedUser);
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: updateData,
+  });
 
-  return updatedUser;
+  return mapPrismaUserToUser(updatedUser);
 }
 
 /**

@@ -17,6 +17,7 @@ export interface UserFormData {
   description: string;
   email: string;
   password: string;
+  avatar_image_url?: string;
 }
 
 export interface UpdateUserRequest {

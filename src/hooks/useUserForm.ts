@@ -12,6 +12,7 @@ interface UseUserFormProps {
 interface UseUserFormReturn {
   formData: UserFormData;
   handleInputChange: (field: keyof UserFormData, value: string) => void;
+  setFormData: React.Dispatch<React.SetStateAction<UserFormData>>;
   resetForm: () => void;
 }
 
@@ -59,6 +60,7 @@ export function useUserForm({ initialUser }: UseUserFormProps = {}): UseUserForm
   return {
     formData,
     handleInputChange,
+    setFormData,
     resetForm,
   };
 }
