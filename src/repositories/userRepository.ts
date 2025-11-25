@@ -101,15 +101,3 @@ export async function updateUserById(
 
   return mapPrismaUserToUser(updatedUser);
 }
-
-/**
- * パスワードをハッシュ化
- */
-export async function hashPassword(password: string): Promise<string> {
-  // TODO: 実際のハッシュ化処理に置き換え
-  // const bcrypt = require('bcrypt');
-  // return await bcrypt.hash(password, 10);
-
-  // 仮実装
-  return `hashed_${password}`;
-}

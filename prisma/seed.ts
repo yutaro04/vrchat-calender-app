@@ -1,14 +1,6 @@
 import "dotenv/config";
 import { prisma } from "../src/lib/prisma";
 
-// ParticipantStatus enumを直接定義
-const ParticipantStatus = {
-  PENDING: 'pending' as const,
-  APPROVED: 'approved' as const,
-  REJECTED: 'rejected' as const,
-  CANCELLED: 'cancelled' as const,
-};
-
 async function main() {
   console.log("🌱 Starting seed...");
 

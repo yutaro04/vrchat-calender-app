@@ -13,19 +13,23 @@ export default function UserEditPage() {
   const router = useRouter();
   const { user, isLoading, error: fetchError } = useUser();
   const { updateUserData, isUpdating, error: updateError } = useUserUpdate();
-  const { formData, handleInputChange, setFormData } = useUserForm({ initialUser: user });
-
-  const handleImageChange = (publicId: string) => {
-    setFormData(prev => ({ ...prev, avatar_image_url: publicId }));
-  };
+  const { formData, handleInputChange } = useUserForm({ initialUser: user });
 
   const handleSave = async () => {
     try {
       const updateData: UpdateUserRequest = {
         nickname: formData.nickname,
-        description: formData.description,
-        email: formData.email,
       };
+
+      // descriptionが空でない場合のみ送信
+      if (formData.description && formData.description.trim() !== '') {
+        updateData.description = formData.description;
+      }
+
+      // emailが空でない場合のみ送信
+      if (formData.email && formData.email.trim() !== '') {
+        updateData.email = formData.email;
+      }
 
       // パスワードが入力されている場合のみ送信
       if (formData.password && formData.password.trim() !== '') {

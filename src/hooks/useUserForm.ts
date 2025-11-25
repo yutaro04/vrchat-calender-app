@@ -22,8 +22,8 @@ export function useUserForm({ initialUser }: UseUserFormProps = {}): UseUserForm
     if (initialUser) {
       return {
         nickname: initialUser.nickname,
-        description: initialUser.description,
-        email: initialUser.email,
+        description: initialUser.description ?? '',
+        email: initialUser.email ?? '',
         password: '', // 編集画面ではパスワードを空にする
       };
     }
@@ -50,8 +50,8 @@ export function useUserForm({ initialUser }: UseUserFormProps = {}): UseUserForm
     if (initialUser) {
       setFormData({
         nickname: initialUser.nickname,
-        description: initialUser.description,
-        email: initialUser.email,
+        description: initialUser.description ?? '',
+        email: initialUser.email ?? '',
         password: '',
       });
     }

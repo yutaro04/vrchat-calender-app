@@ -5,6 +5,7 @@
 
 import type { User } from '@/types/user';
 import * as userRepository from '@/repositories/userRepository';
+import * as authRepository from '@/repositories/authRepository';
 import type { UpdateUserData } from '@/repositories/userRepository';
 import { validateUpdateUserData } from '@/lib/validators/userValidator';
 import type { ValidationError } from '@/lib/validators/userValidator';
@@ -80,7 +81,7 @@ export async function updateUser(
 
   // パスワードのハッシュ化
   if (updateData.password && updateData.password.length > 0) {
-    updateData.password = await userRepository.hashPassword(updateData.password);
+    updateData.password = await authRepository.hashPassword(updateData.password);
   } else {
     // パスワードが空の場合は更新しない
     delete updateData.password;

@@ -8,6 +8,13 @@ import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 
 /**
+ * パスワードをハッシュ化
+ */
+export async function hashPassword(password: string): Promise<string> {
+  return await bcrypt.hash(password, 10);
+}
+
+/**
  * Prismaのユーザーオブジェクトをアプリケーション型に変換
  */
 function mapPrismaUserToUser(prismaUser: {

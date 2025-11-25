@@ -5,9 +5,9 @@
 export interface User {
   id: number;
   nickname: string;
-  description: string;
-  email: string;
-  avatar_image_url: string;
+  description?: string;
+  email?: string;
+  avatar_image_url?: string;
   created_at: string;
   updated_at: string;
 }

@@ -1,5 +1,6 @@
 import type { EventParticipant } from '@/types/event';
 import { prisma } from '@/lib/prisma';
+import { ParticipantStatus } from '@/generated/prisma/client';
 
 /**
  * Prismaの参加者オブジェクトをアプリケーション型に変換
@@ -56,7 +57,7 @@ export async function createParticipant(
       eventId,
       userId,
       role,
-      status: 'PENDING', // Prisma Enumのラベルを使用
+      status: ParticipantStatus.PENDING,
     },
   });
 
@@ -111,7 +112,7 @@ export async function countApprovedParticipants(eventId: number): Promise<number
   return await prisma.eventParticipant.count({
     where: {
       eventId,
-      status: 'APPROVED', // Prisma Enumのラベルを使用
+      status: ParticipantStatus.APPROVED,
       deletedAt: null,
     },
   });

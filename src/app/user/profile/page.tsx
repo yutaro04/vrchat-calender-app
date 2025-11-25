@@ -24,8 +24,8 @@ export default function UserProfilePage() {
 
   const userData: UserFormData = {
     nickname: user.nickname,
-    description: user.description,
-    email: user.email,
+    description: user.description ?? '',
+    email: user.email ?? '',
     password: '********', // パスワードは表示用にマスク
     avatar_image_url: user.avatar_image_url,
   };

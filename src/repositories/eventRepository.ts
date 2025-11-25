@@ -1,4 +1,4 @@
-import type { Event, EventDate } from '@/types/event';
+import type { Event } from '@/types/event';
 import { prisma } from '@/lib/prisma';
 
 /**

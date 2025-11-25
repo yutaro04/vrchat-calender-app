@@ -4,7 +4,10 @@
 
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET must be set');
+}
+const JWT_SECRET = process.env.JWT_SECRET as string;
 const JWT_EXPIRES_IN = '7d'; // 7日間有効
 
 export interface JwtPayload {

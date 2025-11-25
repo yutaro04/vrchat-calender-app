@@ -105,7 +105,14 @@ export async function POST(
       }
     }
 
-    const body = await request.json().catch(() => ({}));
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return validationErrorResponse([
+        { field: 'body', message: 'Invalid JSON in request body' },
+      ]);
+    }
     const role = body.role || 'participant';
 
     // 参加申請を作成
