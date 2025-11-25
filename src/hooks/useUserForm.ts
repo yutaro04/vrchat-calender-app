@@ -2,7 +2,7 @@
  * ユーザーフォームの状態管理フック
  */
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { UserFormData, User } from '@/types/user';
 
 interface UseUserFormProps {
@@ -35,6 +35,11 @@ export function useUserForm({ initialUser }: UseUserFormProps = {}): UseUserForm
   }, [initialUser]);
 
   const [formData, setFormData] = useState<UserFormData>(initialFormData);
+
+  // initialUserが変更されたらformDataを更新
+  useEffect(() => {
+    setFormData(initialFormData);
+  }, [initialFormData]);
 
   const handleInputChange = (field: keyof UserFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
