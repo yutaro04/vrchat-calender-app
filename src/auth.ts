@@ -24,20 +24,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async signIn({ user, account, profile }) {
       if (account?.provider === "google" && profile?.email) {
         try {
-          // Prisma経由でpublic.usersテーブルにUpsert
-          // Supabase Auth側はトリガーで自動同期される
-          const dbUser = await prisma.user.upsert({
+          // 既存ユーザーをチェック
+          const existingUser = await prisma.user.findUnique({
             where: { email: profile.email },
-            update: {
-              nickname: profile.name || profile.email.split("@")[0],
-              avatarUrl: (profile as any).picture || null,
-            },
-            create: {
-              email: profile.email,
-              nickname: profile.name || profile.email.split("@")[0],
-              avatarUrl: (profile as any).picture || null,
-            },
           });
+
+          let dbUser;
+
+          if (existingUser) {
+            // 既存ユーザーの場合は更新しない（ログインのみ）
+            dbUser = existingUser;
+          } else {
+            // 新規ユーザーの場合のみ作成
+            dbUser = await prisma.user.create({
+              data: {
+                email: profile.email,
+                nickname: profile.name || profile.email.split("@")[0],
+                avatarUrl: (profile as any).picture || null,
+              },
+            });
+          }
 
           // NextAuthのユーザーIDにDBのIDをセット
           user.id = dbUser.id.toString();

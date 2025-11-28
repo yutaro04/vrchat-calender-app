@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Home, Search, Calendar, User, Plus, LogIn } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
+import { CldImage } from "next-cloudinary";
 import ROUTES from "../../lib/routes";
 
 interface UserStats {
@@ -11,9 +13,16 @@ interface UserStats {
   hosting: number;
 }
 
+interface UserData {
+  id: number;
+  nickname: string;
+  avatar_image_url?: string;
+}
+
 export function FloatingNav() {
   const [isAtTop, setIsAtTop] = useState(true);
   const [stats, setStats] = useState<UserStats>({ participating: 0, hosting: 0 });
+  const [userData, setUserData] = useState<UserData | null>(null);
   const { data: session, status } = useSession();
   const isLoading = status === "loading";
   const isLoggedIn = !!session;
@@ -29,10 +38,21 @@ export function FloatingNav() {
 
   useEffect(() => {
     if (isLoggedIn) {
+      // Fetch user data
+      fetch('/api/users/me')
+        .then(res => res.json())
+        .then(data => {
+          if (data.data) {
+            setUserData(data.data);
+          }
+        })
+        .catch(err => console.error('Failed to fetch user data:', err));
+
+      // Fetch user stats
       fetch('/api/users/me/stats')
         .then(res => res.json())
         .then(data => {
-          if (data.success && data.data) {
+          if (data.data) {
             setStats(data.data);
           }
         })
@@ -50,20 +70,35 @@ export function FloatingNav() {
             <>
               {isLoggedIn ? (
                 <div className="hidden lg:flex items-center gap-2 pr-2">
-                  <div className="w-8 h-8 rounded-full bg-gray-900 border-2 border-gray-900 overflow-hidden flex-shrink-0 flex items-center justify-center">
-                    {session?.user?.image ? (
-                      <img
-                        src={session.user.image}
-                        alt={session.user.name || "User"}
-                        className="w-full h-full object-cover"
-                      />
+                  <div className="w-8 h-8 rounded-full bg-gray-200 border-2 border-gray-900 overflow-hidden flex-shrink-0 flex items-center justify-center">
+                    {userData?.avatar_image_url ? (
+                      // Cloudinaryの画像かどうかを判定
+                      userData.avatar_image_url.startsWith('http') ? (
+                        <img
+                          src={userData.avatar_image_url}
+                          alt={userData.nickname}
+                          width={32}
+                          height={32}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <CldImage
+                          src={userData.avatar_image_url}
+                          alt={userData.nickname}
+                          width={32}
+                          height={32}
+                          crop="fill"
+                          gravity="face"
+                          className="w-full h-full object-cover"
+                        />
+                      )
                     ) : (
-                      <User className="w-5 h-5 text-white" />
+                      <User className="w-5 h-5 text-gray-500" />
                     )}
                   </div>
                   <div className="flex flex-col">
                     <span className="text-xs text-gray-900 whitespace-nowrap">
-                      {session?.user?.name || "ユーザー"}
+                      {userData?.nickname || "ユーザー"}
                     </span>
                   </div>
                 </div>

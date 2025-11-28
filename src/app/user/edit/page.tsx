@@ -42,7 +42,13 @@ export default function UserEditPage() {
       }
 
       await updateUserData(updateData);
+
+      // プロフィールページに遷移してリロード
       router.push('/user/profile');
+      router.refresh();
+
+      // 完全にリロードして最新の情報を取得
+      window.location.reload();
     } catch (err) {
       // エラーはuseUserUpdateフックで管理される
       console.error('Failed to update user:', err);
