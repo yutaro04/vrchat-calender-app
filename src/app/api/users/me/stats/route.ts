@@ -2,7 +2,6 @@
  * ユーザーのイベント統計情報取得APIコントローラー
  */
 
-import { NextRequest } from 'next/server';
 import { auth } from '@/auth';
 import { prisma } from '@/lib/prisma';
 import {
@@ -15,7 +14,7 @@ import {
  * GET /api/users/me/stats
  * ログインユーザーの参加予定・開催予定の件数を取得
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await auth();
 

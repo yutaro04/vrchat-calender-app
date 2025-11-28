@@ -40,7 +40,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               data: {
                 email: profile.email,
                 nickname: profile.name || profile.email.split("@")[0],
-                avatarUrl: (profile as any).picture || null,
+                avatarUrl: (profile as { picture?: string }).picture || null,
               },
             });
           }
@@ -67,7 +67,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.provider = account.provider;
       }
       if (profile) {
-        token.picture = (profile as any).picture;
+        token.picture = (profile as { picture?: string }).picture;
         token.name = profile.name;
       }
       return token;

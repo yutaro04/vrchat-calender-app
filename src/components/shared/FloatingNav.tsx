@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { Home, Search, Calendar, User, Plus, LogIn } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
@@ -74,11 +73,10 @@ export function FloatingNav() {
                     {userData?.avatar_image_url ? (
                       // Cloudinaryの画像かどうかを判定
                       userData.avatar_image_url.startsWith('http') ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={userData.avatar_image_url}
                           alt={userData.nickname}
-                          width={32}
-                          height={32}
                           className="w-full h-full object-cover"
                         />
                       ) : (

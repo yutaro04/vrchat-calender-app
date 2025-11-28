@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Image from 'next/image';
 import { CldImage, CldUploadWidget } from 'next-cloudinary';
 
 interface UserData {
@@ -68,11 +67,10 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({
                   {userData.avatar_image_url ? (
                     // Cloudinaryの画像かどうかを判定
                     userData.avatar_image_url.startsWith('http') ? (
+                      // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={userData.avatar_image_url}
                         alt="プロフィール写真"
-                        width={80}
-                        height={80}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -96,9 +94,9 @@ const UserProfileForm: React.FC<UserProfileFormProps> = ({
                   {isEditing && (
                     <CldUploadWidget
                       uploadPreset="user_avatars"
-                      onSuccess={(result: any) => {
-                        if (result.event === 'success' && result.info?.secure_url) {
-                          handleInputChange('avatar_image_url', result.info.public_id);
+                      onSuccess={(result) => {
+                        if (result.event === 'success' && typeof result.info === 'object' && result.info && 'secure_url' in result.info) {
+                          handleInputChange('avatar_image_url', result.info.public_id || '');
                         }
                       }}
                     >
