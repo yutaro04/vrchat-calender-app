@@ -19,21 +19,11 @@ export async function GET(request: NextRequest) {
   try {
     const session = await auth();
 
-    if (!session?.user?.email) {
-      return unauthorizedResponse();
+    if (!session?.user?.id) {
+      return unauthorizedResponse('ログインが必要です');
     }
 
-    // メールアドレスからユーザーIDを取得
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { id: true },
-    });
-
-    if (!user) {
-      return unauthorizedResponse();
-    }
-
-    const userId = user.id;
+    const userId = parseInt(session.user.id, 10);
 
     // 参加予定: roleが"admin"以外の件数
     const participatingCount = await prisma.eventParticipant.count({
